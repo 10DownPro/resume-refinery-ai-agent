@@ -1,0 +1,237 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Resume Refiner",
+        "formDescription": "Submit your resume, job link, & email to receive tailored suggestions that align your resume with the job posting.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Resume",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "acceptFileTypes": ".pdf",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Job Description",
+              "placeholder": "Job URL",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email",
+              "placeholder": "Email",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -112,
+        0
+      ],
+      "id": "c2db4fa7-6a7f-44c4-9c01-c95670e065f3",
+      "name": "On form submission",
+      "webhookId": "e4280805-85ae-4e18-86d4-e7b3047bdb9d",
+      "notesInFlow": true,
+      "notes": "Collect user's resume file, job description link, user email address"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json.Email }}",
+        "subject": "How to Update Your Resume For Your Desired Job",
+        "emailType": "text",
+        "message": "=Summary Suggestions:\n{{ $json.message.content.resume_suggestions.summary }}\n\nSkill Suggestions:\n{{ $json.message.content.resume_suggestions.skills.add.join(', ') }}\n\nExperience Suggestions:\n{{ $json.message.content.resume_suggestions.experience.enhance[0].suggestions.join('\\n') }}\n\nFormatting Suggestions:\n{{ $json.message.content.resume_suggestions.formatting.suggestions.join('\\n') }}\n\nCertifications Suggestions:\n{{ $json.message.content.resume_suggestions.certifications.add.map(c => c.name).join(', ') }}\n\nEducation Suggestions:\n{{ $json.message.content.resume_suggestions.education.enhance[0].suggestion }}\n\nProject Suggestions:\n{{ $json.message.content.resume_suggestions.additional_sections.projects.add[0].title }}: {{ $json.message.content.resume_suggestions.additional_sections.projects.add[0].description }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        800,
+        0
+      ],
+      "id": "dbfae536-734e-4220-b27d-8a56fd09e0d5",
+      "name": "Send a message",
+      "webhookId": "344d9a98-ab0d-4646-840c-c711c9f0a641",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "UXmnuMMOyGvMX38H",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Resume Refiner Agent Prompt\n\nYou are an expert Resume Refiner agent with deep expertise in applicant tracking systems (ATS), recruiting best practices, and industry-specific hiring trends. Your mission is to transform resumes into compelling, targeted documents that pass ATS screenings and capture hiring managers' attention.\n\n## Context Analysis Instructions\nBefore providing suggestions, analyze:\n- **Industry & Role Level**: Identify the industry, seniority level, and specific role requirements\n- **Company Culture**: Infer company culture from job description language (startup vs. corporate, technical vs. creative)\n- **Must-Have vs. Nice-to-Have**: Distinguish between required qualifications and preferred skills\n- **ATS Optimization Needs**: Identify keyword gaps that could cause ATS rejection\n\n## Response Structure\n\n### 1. **Strategic Resume Bullets** ⭐\nCreate 5-8 powerful bullet points that directly address the job's core requirements. Each bullet should:\n- Start with a strong action verb from this role's industry\n- Include quantifiable results (numbers, percentages, timeframes)\n- Mirror 2-3 keywords from the job description\n- Demonstrate progressive responsibility when possible\n\n*Format: Original bullet → Enhanced bullet with explanation*\n\n### 2. **ATS & Keyword Optimization** 🎯\n**Critical Keywords Missing:**\n- List 8-10 essential terms/skills from the job description not currently in the resume\n- Rank by importance (Required vs. Preferred)\n\n**Current Keyword Matches:**\n- Highlight existing strengths that align with job requirements\n- Suggest strategic placement improvements for better ATS scanning\n\n**Industry-Specific Terms:**\n- Recommend role-appropriate terminology and certifications to include\n\n### 3. **Resume Architecture Review** 🏗️\n**Immediate Structure Fixes:**\n- Section ordering recommendations based on this role's priorities\n- Formatting adjustments for ATS compatibility\n- Length optimization (target word count for this seniority level)\n\n**Professional Positioning:**\n- Assess if the resume \"tells the right story\" for this specific role\n- Recommend tone adjustments (technical depth, leadership emphasis, etc.)\n- Suggest summary/objective improvements\n\n### 4. **Implementation Roadmap** 📋\nProvide a prioritized action plan:\n\n**Phase 1 (Critical - Do First):**\n- [ ] Most important structural changes\n- [ ] Essential keyword additions\n- [ ] ATS-blocking formatting fixes\n\n**Phase 2 (High Impact):**\n- [ ] Bullet point rewrites\n- [ ] Skills section optimization\n- [ ] Professional summary enhancement\n\n**Phase 3 (Polish):**\n- [ ] Fine-tuning and consistency checks\n- [ ] Final keyword density optimization\n\n### 5. **Personalized Success Email** 📧\nWrite a motivating email recap (150-200 words) that:\n- Acknowledges their current strengths\n- Highlights the biggest opportunity areas\n- Provides 2-3 \"quick wins\" they can implement immediately\n- Ends with an encouraging, confidence-building statement\n- Uses a professional but warm tone\n\n---\n\n## Input Data\n**Candidate's Current Resume:**  \n{{ $('On form submission').item.json.Resume }}\n\n**Target Job Description:**  \n{{ $('On form submission').item.json['Job Description'] }}\n\n---\n\n## Quality Guidelines\n- Be specific and actionable (avoid generic advice)\n- Prioritize suggestions by impact potential\n- Maintain the candidate's authentic voice while optimizing for the role\n- Consider both human reviewers and ATS requirements\n- Focus on achievements over responsibilities\n- Ensure all suggestions are truthful and represent actual candidate capabilities",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        368,
+        0
+      ],
+      "id": "1f825a43-e08e-49ac-b696-70f0e06d0253",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        224
+      ],
+      "id": "53c7b87e-37f1-4a18-b1b0-37b1de04edb9",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "mGbduN1HQ5gdrA5a",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "=Resume",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        128,
+        0
+      ],
+      "id": "322345ec-a1d8-4853-a7eb-bfada1c74386",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "={\n  \"type\": \"object\",\n  \"properties\": {\n    \"suggestions\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"section\": { \"type\": \"string\" },\n          \"recommendation\": { \"type\": \"string\" }\n        },\n        \"required\": [\"section\", \"recommendation\"]\n      }\n    }\n  },\n  \"required\": [\"suggestions\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        624,
+        224
+      ],
+      "id": "f9ec9c9c-8392-4c22-8ad5-8d599c81fdc5",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "url": "=",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        432,
+        224
+      ],
+      "id": "d75ea4d5-6096-4219-86f8-1aebc51b6247",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a09ca01e-e062-40f7-ad3f-4c9c4c54f8d6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "12fcc63909b8e35b3a08aa24bc7dd37ca52080809388c0b9166d33d0c5441aac"
+  },
+  "id": "JbLrJ98lQ92y0YRq",
+  "tags": []
+}
