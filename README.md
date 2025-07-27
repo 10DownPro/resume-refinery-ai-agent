@@ -38,6 +38,7 @@ The AI agent prompt was written to match my tone & style, focusing on clarity, q
 - Enabled `Require Specific Output Format` in the AI Agent node.
 - Used a **Structured Output Parser** node to define exactly what JSON keys the response needed.
 - Iterated on the prompt until it consistently returned properly formatted JSON.
+- Our class API token for our Open AI agent ran out. I was unable to test my workflow fully, but the workflow was completing successfully up until this point.
 
 ---
 
