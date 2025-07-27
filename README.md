@@ -83,6 +83,6 @@ The AI agent prompt was written to match my tone & style, focusing on clarity, q
 ---
 
 ## 📂 Files Included in GitHub
-- `resume-refiner-workflow.json` → #export this from n8n
+- `resume-refiner-workflow.json` → #exported & uploaded workflow from n8n
 - `README.md` → #this file
-- `screenshots/` → #upload all required screenshots in this folder
+- `screenshots/` → #added all required screenshots files in this folder
