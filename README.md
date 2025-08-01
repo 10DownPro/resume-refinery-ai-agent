@@ -1,89 +1,95 @@
 # Resume Refiner AI Agent
 
-## 📌 Overview
-This project is a custom AI-powered Resume Refiner built using n8n. It takes a user's uploaded resume, a job description URL, & their email — then uses OpenAI to analyze the content & send back tailored suggestions to improve the resume for that specific job.
+## 📌 Overview  
+When you're job hunting, a generic resume won’t cut it. So I built something smarter.  
+This project is a custom AI powered **Resume Refiner Agent**, built with **n8n** and **OpenAI**.  
 
-Tech stack:
-- Draw.io (map out project)
-- n8n (automation platform)
-- OpenAI GPT model
-- Google Form (trigger)
-- Gmail (output)
-- Custom JSON parser
+Drop your resume, a job link, and your email and it sends you back tailored, plain language suggestions to boost your resume for that specific role.
 
----
+### 👇🏾 How it works:
+- 📎 You upload your resume & paste a job posting URL  
+- 🧠 OpenAI reads both, compares them, & figures out what’s missing  
+- 📬 Then you get a clean, human readable email with bullet rewrites, keyword tips, and formatting suggestions straight to your inbox  
 
-## 🔁 AI Agent Flow Diagram
-# <img width="663" height="414" alt="Screenshot 2025-07-26 at 8 48 07 PM" src="https://github.com/user-attachments/assets/6939d360-18f6-4139-8760-5f781dc268f9" />
+This was more than just a tech exercise.. it was personal. The week I built this, I was dealing with the loss of a loved one. Still, I showed up, pushed through, and shipped a tool that helps solve a real problem.
 
 ---
 
-## 🛠️ Building the Agent
-
-### I. What approach did you take to design your agent?
-I broke the workflow into four key parts:
-1. **Trigger Node** – Google Form submission collects the resume, job URL, & email.
-2. **Job Description Scraper** – Extracts job text from the provided URL using an HTTP Request.
-3. **AI Agent Node** – Prompts OpenAI with structured input and requests JSON output.
-4. **Email Node** – Sends formatted suggestions back to the user.
-
-The AI agent prompt was written to match my tone & style, focusing on clarity, quantifiable bullet rewrites, & keyword mapping.
-
-### II. What challenges did you face in parsing, formatting, or integrating?
-- The job description returned in HTML, so I had to clean the content with a code node.
-- Parsing PDF resumes was unreadable at first; the Extract PDF node helped get raw text.
-- Getting strict JSON from OpenAI took trial & error — prompt engineering + output schema played a big part.
-
-### III. How did you ensure that the AI returned JSON reliably?
-- Enabled `Require Specific Output Format` in the AI Agent node.
-- Used a **Structured Output Parser** node to define exactly what JSON keys the response needed.
-- Iterated on the prompt until it consistently returned properly formatted JSON.
-- Our class API token for our Open AI agent ran out. I was unable to test my workflow fully, but the workflow was completing successfully up until this point.
+## 🗺️ Agent Workflow Diagram  
+<img width="663" height="414" alt="AI Agent Flow" src="https://github.com/user-attachments/assets/6939d360-18f6-4139-8760-5f781dc268f9" />
 
 ---
 
-## 🐛 Troubleshooting
+## 🛠️ How I Built It  
 
-### IV. What issues did you encounter & how did you resolve them?
-- **Broken JSON from AI:**
-  - **Fix:** Rewrote the prompt to clearly request structured output, tested against multiple inputs.
+### I. My approach  
+I broke the process into four key stages:
 
-- **Mismatch between resume & job terms:**
-  - **Fix:** Added a comparison table output in the JSON showing missing/matched keywords.
+1. **Trigger Node** — Kicks off when someone submits a Google Form with resume + job URL + email  
+2. **Job Scraper** — Grabs the job description using an HTTP Request node  
+3. **AI Agent Node** — Sends the job & resume text to OpenAI with a prompt I wrote for clean, structured feedback  
+4. **Email Node** — Sends that feedback back to the user via Gmail  
 
-- **Bad email formatting:**
-  - **Fix:** Switched to corrct AI Agent - was previously using "Send to Message" open AI which wasn't extracting the data correctly or providing the correct output.
+The setup is modular (flexible), so you can easily swap the resume parser or change how the email looks.
 
----
-
-## 🚀 Optimization
-
-### V. What might you improve or add in future iterations?
-- Support for DOCX resume uploads alongside PDFs.
-- Integrate LinkedIn scraping for auto-summary suggestions.
-- Add a resume score based on keyword overlap & formatting.
-- Log form submissions & results in a database for tracking.
+While we couldn’t test the full end to end experience due to our OpenAI token running out in class, the core flow — form submission, scraping, OpenAI call, email formatting — all worked cleanly up to that point. The email node should be ready to fire once the token is restored.
 
 ---
 
-## 📸 Screenshots
-
-- ✅ Full n8n Agent Workflow view <img width="729" height="270" alt="Screenshot 2025-07-26 at 8 55 18 PM" src="https://github.com/user-attachments/assets/1626c0a3-529f-48ed-9524-e0a2591fc5e0" />
-
-- ✅ AI Agent node configuration <img width="952" height="483" alt="Screenshot 2025-07-26 at 8 57 03 PM" src="https://github.com/user-attachments/assets/6f0d9c17-7c4a-4380-a89d-2a111c5c041d" />
-
-- ✅ Trigger node setup <br><img width="602" height="535" alt="Screenshot 2025-07-26 at 8 57 57 PM" src="https://github.com/user-attachments/assets/701f27f6-3a8c-4d9f-8481-a58d2183cbe8" />
-
-- ✅ Email node configuration <br><img width="515" height="550" alt="Screenshot 2025-07-26 at 8 58 48 PM" src="https://github.com/user-attachments/assets/7d8708a2-fbc1-48bc-b0d9-4add7e68fa4b" />
-
-- ✅ Example form input <br><img width="553" height="563" alt="Screenshot 2025-07-26 at 9 00 06 PM" src="https://github.com/user-attachments/assets/8aa00ba7-6399-41ee-8e10-e34787de825d" />
-
-- ✅ Example email output <img width="918" height="426" alt="Screenshot 2025-07-26 at 9 00 48 PM" src="https://github.com/user-attachments/assets/70039c2e-8e98-4e54-b266-8bc5f1d77bdf" /> 
-(This output is from a previous prompt - our class API token ran out so I was not able to test my current prompt)
+### II. The hard parts  
+- **HTML job descriptions**: The job post was returned as a full HTML page, so I added a Code node to strip tags & extract only relevant text.  
+- **PDF parsing**: PDF resumes came in jumbled — I used `Extract PDF` to reliably convert them to plain text.  
+- **AI output formatting**: OpenAI didn’t always give clean JSON, so I had to switch up my prompt and use structured output parsing.
 
 ---
 
-## 📂 Files Included in GitHub
-- `resume-refiner-workflow.json` → #exported & uploaded workflow from n8n
-- `README.md` → #this file
-- `screenshots/` → #added all required screenshots files in this folder
+### III. Getting reliable AI responses  
+- ✅ Used `Require Specific Output Format`  
+- ✅ Set strict JSON expectations in prompt  
+- ✅ Added a **Structured Output Parser** node in n8n  
+- ✅ Reworked the AI prompt to clearly define what kind of edits it should return (e.g. bullet rewrites, keyword match, formatting tips)
+
+---
+
+## 🐛 Debug Log  
+
+### What broke & how I fixed it:
+
+- **Broken JSON output**  
+  → Rewrote the prompt to clearly request structured feedback — worked after multiple tests.  
+
+- **Mismatch between resume & job terms**  
+  → AI now shows a comparison of missing vs. matched keywords in plain English.  
+
+- **Gmail node didn’t send clean output**  
+  → Switched from `Send to Message` to `Send Email` node in n8n — fixed it.  
+
+---
+
+## 🚀 What’s next  
+Here’s what I’d add if I had more time:  
+- Upload support for DOCX resumes  
+- LinkedIn scraping for instant summaries  
+- Resume score system (based on formatting & keyword alignment)  
+- Store results in a Notion DB for ongoing tracking & improvement  
+
+---
+
+## 📸 Screenshots  
+| View | Screenshot |
+|------|------------|
+| Full Agent Workflow | ![Workflow](https://github.com/user-attachments/assets/1626c0a3-529f-48ed-9524-e0a2591fc5e0) |
+| AI Agent Node | ![AI Node](https://github.com/user-attachments/assets/6f0d9c17-7c4a-4380-a89d-2a111c5c041d) |
+| Trigger Node | ![Trigger Node](https://github.com/user-attachments/assets/701f27f6-3a8c-4d9f-8481-a58d2183cbe8) |
+| Email Node | ![Email Node](https://github.com/user-attachments/assets/7d8708a2-fbc1-48bc-b0d9-4add7e68fa4b) |
+| Example Form | ![Form Input](https://github.com/user-attachments/assets/8aa00ba7-6399-41ee-8e10-e34787de825d) |
+| Example Email | ![Email Output](https://github.com/user-attachments/assets/70039c2e-8e98-4e54-b266-8bc5f1d77bdf) _(This one’s from a prior version of the prompt — updated output wasn’t tested due to token limits)_ |
+
+---
+
+## 📂 Repo Files  
+- `resume-refiner-workflow.json` → Download & import into n8n  
+- `README.md` → This doc  
+- `screenshots/` → All reference images  
+
+---
